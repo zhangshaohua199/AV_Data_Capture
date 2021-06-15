@@ -4,6 +4,8 @@ import pathlib
 import re
 import shutil
 import platform
+import traceback
+
 
 from PIL import Image
 from io import BytesIO
@@ -40,8 +42,8 @@ def moveFailedFolder(filepath, failed_folder):
             print('[-]Create symlink to Failed output folder')
             os.symlink(filepath, destination_path + '/' + file_name)
         else:
-            print('[-]Move to Failed output folder')
-            shutil.move(filepath, destination_path)
+            print('[-]Move to Failed output folder:' + filepath + ' --> ' + failed_folder)
+            shutil.move(filepath, failed_folder)
     return
 
 
@@ -98,8 +100,10 @@ def get_data_from_json(file_number, filepath, conf: config.Config):  # 从JSON�
         try:
             if conf.debug() == True:
                 print('[+]select',source)
+            #import pdb;pdb.set_trace()
             json_data = json.loads(func_mapping[source](file_number))
             # if any service return a valid return, break
+            print(json_data)
             if get_data_state(json_data):
                 break
         except:
@@ -373,7 +377,7 @@ def download_file_with_filename(url, filename, path, conf: config.Config, filepa
             i += 1
             print('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
     print('[-]Connect Failed! Please check your Proxy or Network!')
-    moveFailedFolder(filepath, failed_folder)
+    #moveFailedFolder(filepath, failed_folder)
     return
 
 def trailer_download(trailer, leak_word, c_word, number, path, filepath, conf: config.Config, failed_folder):
@@ -397,7 +401,7 @@ def extrafanart_download(data, path, conf: config.Config, filepath, failed_folde
     path = path + '/' + conf.get_extrafanart()
     for url in data:
         if download_file_with_filename(url, '/extrafanart-' + str(j)+'.jpg', path, conf, filepath, failed_folder) == 'failed':
-            moveFailedFolder(filepath, failed_folder)
+            #moveFailedFolder(filepath, failed_folder)
             return
         switch, _proxy, _timeout, retry, _proxytype = conf.proxy()
         for i in range(retry):
@@ -418,7 +422,7 @@ def extrafanart_download(data, path, conf: config.Config, filepath, failed_folde
 # 封面是否下载成功，否则移动到failed
 def image_download(cover, number, leak_word, c_word, path, conf: config.Config, filepath, failed_folder):
     if download_file_with_filename(cover, number + leak_word + c_word + '-fanart.jpg', path, conf, filepath, failed_folder) == 'failed':
-        moveFailedFolder(filepath, failed_folder)
+        # moveFailedFolder(filepath, failed_folder)
         return
 
     switch, _proxy, _timeout, retry, _proxytype = conf.proxy()
@@ -499,11 +503,11 @@ def print_files(path, leak_word, c_word, naming_rule, part, cn_sub, json_data, f
             print("[+]Wrote!            " + path + "/" + number + part + leak_word + c_word + ".nfo")
     except IOError as e:
         print("[-]Write Failed!")
-        print(e)
+        print(traceback.format_exc())
         moveFailedFolder(filepath, failed_folder)
         return
     except Exception as e1:
-        print(e1)
+        print(traceback.format_exc())
         print("[-]Write Failed!")
         moveFailedFolder(filepath, failed_folder)
         return
@@ -679,6 +683,14 @@ def debug_print(data: json):
     except:
         pass
 
+def gen_info_files(path, json_data):
+    # naming_rule
+    # tag
+    try:
+        open(os.path.join(path, json_data.get("naming_rule")), 'a').close()
+        open(os.path.join(path, '-'.join(json_data.get("tag"))), 'a').close()
+    except:
+        pass
 
 def core_main(file_path, number_th, conf: config.Config):
     # =======================================================================初始化所需变量
@@ -753,7 +765,11 @@ def core_main(file_path, number_th, conf: config.Config):
             small_cover_check(path, number,  json_data.get('cover_small'), leak_word, c_word, conf, filepath, conf.failed_folder())
 
         # creatFolder会返回番号路径
-        image_download( json_data.get('cover'), number, leak_word, c_word, path, conf, filepath, conf.failed_folder())
+        try:
+            image_download( json_data.get('cover'), number, leak_word, c_word, path, conf, filepath, conf.failed_folder())
+        except:
+            pass
+
         try:
             # 下载预告片
             if json_data.get('trailer'):
@@ -768,13 +784,17 @@ def core_main(file_path, number_th, conf: config.Config):
         except:
             pass
         # 裁剪图
-        cutImage(imagecut, path, number, leak_word, c_word)
+        try:
+            cutImage(imagecut, path, number, leak_word, c_word)
+        except:
+            pass
 
         # 打印文件
         print_files(path, leak_word, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder(), tag,  json_data.get('actor_list'), liuchu, uncensored)
 
         # 移动文件
         paste_file_to_folder(filepath, path, number, leak_word, c_word, conf)
+        gen_info_files(path, json_data)
         
         poster_path = path + '/' + number + leak_word + c_word + '-poster.jpg'
         thumb_path = path + '/' + number + leak_word + c_word + '-thumb.jpg'
@@ -786,6 +806,7 @@ def core_main(file_path, number_th, conf: config.Config):
         path = create_folder(conf.success_folder(), json_data.get('location_rule'), json_data, conf)
         # 移动文件
         paste_file_to_folder_mode2(filepath, path, multi_part, number, part, leak_word, c_word, conf)
+        gen_info_files(path, json_data)
         poster_path = path + '/' + number + leak_word + c_word + '-poster.jpg'
         thumb_path = path + '/' + number + leak_word + c_word + '-thumb.jpg'
         if conf.is_watermark():
@@ -823,3 +844,4 @@ def core_main(file_path, number_th, conf: config.Config):
         thumb_path = path + '/' + number + leak_word + c_word + '-thumb.jpg'
         if conf.is_watermark():
             add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf)
+        gen_info_files(path, json_data)

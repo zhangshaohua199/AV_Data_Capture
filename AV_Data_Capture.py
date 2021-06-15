@@ -83,12 +83,13 @@ def create_data_and_move(file_path: str, c: config.Config, debug):
     file_path = os.path.abspath(file_path)
 
     if debug == True:
-        print("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-        core_main(file_path, n_number, c)
-        print("[*]======================================================")
-    else:
+    #    print("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
+    #    core_main(file_path, n_number, c)
+    #    print("[*]======================================================")
+    #else:
         try:
             print("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
+            # import pdb; pdb.set_trace()
             core_main(file_path, n_number, c)
             print("[*]======================================================")
         except Exception as err:
@@ -170,12 +171,15 @@ if __name__ == '__main__':
         for movie_path in movie_list:  # 遍历电影列表 交给core处理
             count = count + 1
             percentage = str(count / int(count_all) * 100)[:4] + '%'
-            print('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
+            print('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -' + movie_path)
             create_data_and_move(movie_path, conf, conf.debug())
+            #input("Press enter key exit, you can check the error message before you exit...")
+            #if os.path.exists('stop'):
+            #    sys.exit(0)
 
     rm_empty_folder(conf.success_folder())
     rm_empty_folder(conf.failed_folder())
     print("[+]All finished!!!")
-    if not (conf.auto_exit() or auto_exit):
-        input("Press enter key exit, you can check the error message before you exit...")
+    #if not (conf.auto_exit() or auto_exit):
+    #    input("Press enter key exit, you can check the error message before you exit...")
     sys.exit(0)

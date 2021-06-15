@@ -12,26 +12,29 @@ from ADC_function import get_javlib_cookie, get_html
 
 
 def main(number: str):
-    raw_cookies, user_agent = get_javlib_cookie()
+    try:
+        raw_cookies, user_agent = get_javlib_cookie()
 
     # Blank cookies mean javlib site return error
-    if not raw_cookies:
-        return json.dumps({}, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
+        if not raw_cookies:
+            return json.dumps({}, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
 
-    # Manually construct a dictionary
-    s_cookie = SimpleCookie()
-    s_cookie.load(raw_cookies)
-    cookies = {}
-    for key, morsel in s_cookie.items():
-        cookies[key] = morsel.value
+        # Manually construct a dictionary
+        s_cookie = SimpleCookie()
+        s_cookie.load(raw_cookies)
+        cookies = {}
+        for key, morsel in s_cookie.items():
+            cookies[key] = morsel.value
 
     # Scraping
-    result = get_html(
-        "http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}".format(number),
-        cookies=cookies,
-        ua=user_agent,
-        return_type="object"
-    )
+        result = get_html(
+            "http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}".format(number),
+            cookies=cookies,
+            ua=user_agent,
+            return_type="object"
+        )
+    except:
+        return "{}"
     soup = BeautifulSoup(result.text, "html.parser")
     lx = html.fromstring(str(soup))
     

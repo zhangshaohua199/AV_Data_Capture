@@ -167,48 +167,55 @@ def search(keyword): #搜索，返回结果
 def main(number):
     try:
         try:
-            htmlcode = get_html('https://cn.airav.wiki/video/' + number)
-            javbus_htmlcode = get_html('https://www.javbus.com/ja/' + number)
+            html = etree.fromstring(get_html('https://cn.airav.wiki/?search=' + number), etree.HTMLParser())  # //table/tr[1]/td[1]/text()
 
+            vedio_href = str(html.xpath('//a[@class="d-block"]/@href')[0])
+            vedio_href = 'https://cn.airav.wiki' + vedio_href
+
+            video_html = etree.fromstring(get_html(vedio_href))
+
+            script_text = video_html.xpath('//script[@id="__NEXT_DATA__"]')[0].text
+            info_dict = json.loads(script_text)
+            video_info_dict = info_dict.get('props').get('initialProps').get('pageProps').get('video')
 
         except:
             print(number)
 
         dic = {
             # 标题可使用airav
-            'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))),
+            'title': str(re.sub('\w+-\d+-', '', video_info_dict.get('name'))),
             # 制作商选择使用javbus
-            'studio': getStudio(javbus_htmlcode),
+            'studio': video_info_dict.get('factories')[0].get('name'),
             # 年份也是用javbus
-            'year': str(re.search('\d{4}', getYear(javbus_htmlcode)).group()),
+            'year': video_info_dict.get('publish_date', ''),
             #  简介 使用 airav
-            'outline': getOutline(htmlcode),
+            'outline': video_info_dict.get('description', '无'),
             # 使用javbus
-            'runtime': getRuntime(javbus_htmlcode),
+            'runtime': video_info_dict.get('runtime', '99'),
             # 导演 使用javbus
-            'director': getDirector(javbus_htmlcode),
+            'director': video_info_dict.get('director', '无'),
             # 作者 使用airav
-            'actor': getActor(javbus_htmlcode),
+            'actor':video_info_dict.get('actors_name', '无'),
             # 发售日使用javbus
-            'release': getRelease(javbus_htmlcode),
+            'release': video_info_dict.get('publish_date'),
             # 番号使用javbus
-            'number': getNum(javbus_htmlcode),
+            'number': video_info_dict.get('barcode'),
             # 封面链接 使用javbus
-            'cover': getCover(javbus_htmlcode),
+            'cover': video_info_dict.get('img_url', '无'),
             # 剧照获取
-            'extrafanart': getExtrafanart(htmlcode),
+            'extrafanart': video_info_dict.get('images', []),
             'imagecut': 1,
             # 使用 airav
-            'tag': getTag(htmlcode),
+            'tag': [item.get('name') for item in video_info_dict.get('tags')],
             # 使用javbus
-            'label': getSerise(javbus_htmlcode),
+            'label': video_info_dict.get('lable', '无'),
             # 妈的，airav不提供作者图片
-            'actor_photo': getActorPhoto(javbus_htmlcode),
+            'actor_photo': video_info_dict.get('actor_photo', ''),
 
             'website': 'https://www.airav.wiki/video/' + number,
             'source': 'airav.py',
             # 使用javbus
-            'series': getSerise(javbus_htmlcode),
+            'series': video_info_dict.get('publish_date', ''),
         }
         js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,separators=(',', ':'), )  # .encode('UTF-8')
         return js
@@ -225,8 +232,5 @@ def main(number):
 if __name__ == '__main__':
     #print(main('ADN-188'))
 
-    print(main('ADN-188'))
-    print(main('012717_472'))
-    print(main('080719-976'))
-    print(main('姫川ゆうな'))
+    print(main('041521_460'))
 

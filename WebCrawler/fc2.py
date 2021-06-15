@@ -47,12 +47,15 @@ def getCover_fc2com(htmlcode2): #获取厂商 #
 #     result = str(html.xpath('/html/body/div/text()')).strip(" ['']").replace("\\n",'',10000).replace("'",'',10000).replace(', ,','').strip('  ').replace('。,',',')
 #     return result
 def getTag_fc2com(number):     #获取番号
-    htmlcode = str(bytes(ADC_function.get_html('http://adult.contents.fc2.com/api/v4/article/'+number+'/tag?'),'utf-8').decode('unicode-escape'))
-    result = re.findall('"tag":"(.*?)"', htmlcode)
     tag = []
-    for i in result:
-        tag.append(ADC_function.translateTag_to_sc(i))
-    return tag
+    try:
+        htmlcode = str(bytes(ADC_function.get_html('http://adult.contents.fc2.com/api/v4/article/'+number+'/tag?'),'utf-8').decode('unicode-escape'))
+        result = re.findall('"tag":"(.*?)"', htmlcode)
+        for i in result:
+            tag.append(ADC_function.translateTag_to_sc(i))
+        return tag
+    except:
+        return tag
 def getYear_fc2com(release):
     try:
         result = re.search('\d{4}',release).group()
@@ -90,6 +93,9 @@ def main(number):
         actor = getActor_fc2com(htmlcode2)
         if getActor_fc2com(htmlcode2) == '':
             actor = 'FC2系列'
+        title = getTitle_fc2com(htmlcode2)
+        if title == 'お探しの商品が見つかりません' or title == '':
+            return '{"title": ""}'
         dic = {
             'title': getTitle_fc2com(htmlcode2),
             'studio': getStudio_fc2com(htmlcode2),
@@ -118,5 +124,5 @@ def main(number):
     return js
 
 if __name__ == '__main__':
-    print(main('FC2-1603395'))
+    print(main('FC2-JNC-1657'))
 

@@ -66,7 +66,10 @@ def get_number(debug,filepath: str) -> str:
             filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filepath))  # 去除文件名中时间
             if 'FC2' or 'fc2' in filename:
                 filename = filename.replace('PPV', '').replace('ppv', '').replace('--', '-').replace('_', '-')
-            file_number = re.search(r'\w+-\w+', filename, re.A).group()
+            search_obj = re.search(r'\w+-\w+', filename, re.A)
+            if not search_obj:
+                return
+            file_number = search_obj.group()
             tokyo_hot_check = filename.lower()
             if "tokyo" in tokyo_hot_check and "hot" in tokyo_hot_check:
                     file_number = re.search(r'(cz|k|n|red-|se)\d{3,4}', tokyo_hot_check, re.A).group()
