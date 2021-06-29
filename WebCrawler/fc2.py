@@ -10,7 +10,7 @@ import ADC_function
 
 def getTitle_fc2com(htmlcode): #获取厂商
     html = etree.fromstring(htmlcode,etree.HTMLParser())
-    result = html.xpath('/html/head/title/text()')[0]
+    result = html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[2]/h3/text()')[0]
     return result
 def getActor_fc2com(htmlcode):
     try:
@@ -81,15 +81,15 @@ def getTrailer(htmlcode):
         video_url = video[0].replace('\'', '')
         video_url = 'https://adult.contents.fc2.com/api/v2/videos/1603395/sample?key=' + video_url
         url_json = eval(ADC_function.get_html(video_url))['path'].replace('\\', '')
+        return url_json
     else:
         video_url = ''
-
-    return url_json
 
 def main(number):
     try:
         number = number.replace('FC2-', '').replace('fc2-', '')
         htmlcode2 = ADC_function.get_html('https://adult.contents.fc2.com/article/' + number + '/')
+        #print(htmlcode2)
         actor = getActor_fc2com(htmlcode2)
         if getActor_fc2com(htmlcode2) == '':
             actor = 'FC2系列'
@@ -118,11 +118,13 @@ def main(number):
             'series': '',
         }
     except Exception as e:
-        print(e)
+        if ADC_function.config.Config().debug():
+            print(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
 if __name__ == '__main__':
     print(main('FC2-JNC-1657'))
+    print(main('FC2-1787685'))
 

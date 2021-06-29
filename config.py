@@ -1,7 +1,7 @@
 import os
+import sys
 import configparser
 import codecs
-
 
 class Config:
     def __init__(self, path: str = "config.ini"):
@@ -12,16 +12,20 @@ class Config:
             except:
                 self.conf.read(path, encoding="utf-8")
         else:
-            try:
-                self.conf = configparser.ConfigParser()
-                try: # From single crawler debug use only
-                    self.conf.read('../' + path, encoding="utf-8-sig")
-                except:
-                    self.conf.read('../' + path, encoding="utf-8")
-            except Exception as e:
-                print("[-]Config file not found! Use the default settings")
-                print("[-]",e)
-                self.conf = self._default_config()
+            print("[-]Config file not found!")
+            sys.exit(2)
+            # self.conf = self._default_config()
+            # try:
+            #     self.conf = configparser.ConfigParser()
+            #     try: # From single crawler debug use only
+            #         self.conf.read('../' + path, encoding="utf-8-sig")
+            #     except:
+            #         self.conf.read('../' + path, encoding="utf-8")
+            # except Exception as e:
+            #     print("[-]Config file not found! Use the default settings")
+            #     print("[-]",e)
+            #     sys.exit(3)
+            #     #self.conf = self._default_config()
 
     def main_mode(self) -> str:
         try:
@@ -35,6 +39,9 @@ class Config:
     def success_folder(self) -> str:
         return self.conf.get("common", "success_output_folder")
 
+    def actor_gender(self) -> str:
+        return self.conf.get("common", "actor_gender")
+
     def soft_link(self) -> bool:
         return self.conf.getboolean("common", "soft_link")
     def failed_move(self) -> bool:
@@ -43,6 +50,8 @@ class Config:
         return self.conf.getboolean("common", "auto_exit")
     def transalte_to_sc(self) -> bool:
         return self.conf.getboolean("common", "transalte_to_sc")
+    def multi_threading(self) -> bool:
+        return self.conf.getboolean("common", "multi_threading")
     def is_transalte(self) -> bool:
         return self.conf.getboolean("transalte", "switch")
     def is_trailer(self) -> bool:
@@ -52,8 +61,8 @@ class Config:
         return self.conf.getboolean("watermark", "switch")
 
     def is_extrafanart(self) -> bool:
-        return self.conf.getboolean("extrafanart", "switch")   
-    
+        return self.conf.getboolean("extrafanart", "switch")
+
     def watermark_type(self) -> int:
         return int(self.conf.get("watermark", "water"))
 
@@ -83,7 +92,7 @@ class Config:
         return self.conf.getint("transalte","delay")
     def transalte_values(self) -> str:
         return self.conf.get("transalte", "values")
-    def proxy(self) -> [str, int, int, str]:
+    def proxy(self):
         try:
             sec = "proxy"
             switch = self.conf.get(sec, "switch")
@@ -91,25 +100,26 @@ class Config:
             timeout = self.conf.getint(sec, "timeout")
             retry = self.conf.getint(sec, "retry")
             proxytype = self.conf.get(sec, "type")
-            return switch, proxy, timeout, retry, proxytype
+            iniProxy = IniProxy(switch, proxy, timeout, retry, proxytype)
+            return iniProxy
         except ValueError:
             self._exit("common")
 
     def cacert_file(self) -> str:
         return self.conf.get('proxy', 'cacert_file')
-            
+
     def media_type(self) -> str:
         return self.conf.get('media', 'media_type')
 
     def sub_rule(self):
         return self.conf.get('media', 'sub_type').split(',')
-            
+
     def naming_rule(self) -> str:
         return self.conf.get("Name_Rule", "naming_rule")
 
     def location_rule(self) -> str:
         return self.conf.get("Name_Rule", "location_rule")
-    
+
     def max_title_len(self) -> int:
         """
         Maximum title length
@@ -156,6 +166,8 @@ class Config:
         conf.set(sec1, "failed_move", "1")
         conf.set(sec1, "auto_exit", "0")
         conf.set(sec1, "transalte_to_sc", "1")
+        # actor_gender value: female or male or both or all(含人妖)
+        conf.set(sec1, "actor_gender", "female")
 
         sec2 = "proxy"
         conf.add_section(sec2)
@@ -197,7 +209,7 @@ class Config:
         conf.set(sec8, "key", "")
         conf.set(sec8, "delay", "1")
         conf.set(sec8, "values", "title,outline")
-        
+
         sec9 = "trailer"
         conf.add_section(sec9)
         conf.set(sec9, "switch", "0")
@@ -224,6 +236,43 @@ class Config:
         return conf
 
 
+
+
+class IniProxy():
+    """ Proxy Config from .ini
+    """
+    SUPPORT_PROXY_TYPE = ("http", "socks5", "socks5h")
+
+    enable = False
+    address = ""
+    timeout = 5
+    retry = 3
+    proxytype = "socks5"
+
+    def __init__(self, switch, address, timeout, retry, proxytype) -> None:
+        """ Initial Proxy from .ini
+        """
+        if switch == '1' or switch == 1:
+            self.enable = True
+        self.address = address
+        self.timeout = timeout
+        self.retry = retry
+        self.proxytype = proxytype
+    
+    def proxies(self):
+        ''' 获得代理参数，默认http代理
+        '''
+        if self.address:
+            if self.proxytype in self.SUPPORT_PROXY_TYPE:
+                proxies = {"http": self.proxytype + "://" + self.address, "https": self.proxytype + "://" + self.address}
+            else:
+                proxies = {"http": "http://" + self.address, "https": "https://" + self.address}
+        else:
+            proxies = {}
+
+        return proxies
+
+
 if __name__ == "__main__":
     config = Config()
     print(config.main_mode())
@@ -232,7 +281,8 @@ if __name__ == "__main__":
     print(config.soft_link())
     print(config.failed_move())
     print(config.auto_exit())
-    print(config.proxy())
+    print(config.proxy().enable)
+    print(config.proxy().retry)
     print(config.naming_rule())
     print(config.location_rule())
     print(config.update_check())
@@ -246,3 +296,4 @@ if __name__ == "__main__":
     print(config.get_transalte_key())
     print(config.get_transalte_delay())
     print(config.transalte_values())
+    print(config.actor_gender())

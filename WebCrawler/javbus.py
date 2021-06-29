@@ -17,7 +17,8 @@ def getActorPhoto(htmlcode): #//*[@id="star_qdt"]/li/a/img
         l=i.a['href']
         t=i.get_text()
         html = etree.fromstring(get_html(l), etree.HTMLParser())
-        p=str(html.xpath('//*[@id="waterfall"]/div[1]/div/div[1]/img/@src')).strip(" ['']")
+        p=abs_url("https://www.javbus.com",
+                  str(html.xpath('//*[@id="waterfall"]/div[1]/div/div[1]/img/@src')).strip(" ['']"))
         p2={t:p}
         d.update(p2)
     return d
@@ -47,7 +48,7 @@ def getYear(htmlcode):   #获取年份
 def getCover(htmlcode):  #获取封面链接
     doc = pq(htmlcode)
     image = doc('a.bigImage')
-    return image.attr('href')
+    return abs_url("https://www.javbus.com", image.attr('href'))
 def getRelease(htmlcode): #获取出版日期
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[2]/text()')).strip(" ['']")
@@ -80,7 +81,7 @@ def getCID(htmlcode):
     string = html.xpath("//a[contains(@class,'sample-box')][1]/@href")[0].replace('https://pics.dmm.co.jp/digital/video/','')
     result = re.sub('/.*?.jpg','',string)
     return result
-def getOutline(number):  #获取演员
+def getOutline(number):  #获取剧情介绍
     try:
         response = json.loads(airav.main(number))
         result = response['outline']
@@ -103,7 +104,7 @@ def getTag(htmlcode):  # 获取标签
     soup = BeautifulSoup(htmlcode, 'lxml')
     a = soup.find_all(attrs={'class': 'genre'})
     for i in a:
-        if 'onmouseout' in str(i):
+        if 'onmouseout' in str(i) or '多選提交' in str(i):
             continue
         tag.append(translateTag_to_sc(i.get_text()))
     return tag
@@ -178,7 +179,9 @@ def main(number):
             return js
         except:
             return main_uncensored(number)
-    except:
+    except Exception as e:
+        if config.Config().debug():
+            print(e)
         data = {
             "title": "",
         }
@@ -189,3 +192,4 @@ def main(number):
 
 if __name__ == "__main__" :
     print(main('ipx-292'))
+    print(main('CEMD-011'))

@@ -1,4 +1,4 @@
-# AV Data Capture (CLI)
+<h1 align="center">AV Data Capture - CLI</h1>
 
 CLI 版本  
 ![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat)
@@ -17,11 +17,11 @@ CLI 版本
 #### 本地电影刮削与整理一体化解决方案
 
 # 文档
-* [官方WIKI](https://github.com/yoshiko2/AV_Data_Capture/wiki)
+* [官方WIKI（不看你怎么用）](https://github.com/yoshiko2/AV_Data_Capture/wiki)
 * [VergilGao's Docker部署](https://github.com/VergilGao/docker-avdc)
 
-# 版本发布
-* [Release](https://github.com/yoshiko2/AV_Data_Capture/releases)
+# 下载
+* [Releases](https://github.com/yoshiko2/AV_Data_Capture/releases/latest)
 
 #  申明
 当你查阅、下载了本项目源代码或二进制程序，即代表你接受了以下条款
@@ -34,7 +34,7 @@ CLI 版本
 * 用户在使用本软件时，若用户在当地产生一切违法行为由用户承担
 * 严禁用户将本软件使用于商业和个人其他意图
 * 源代码和二进制程序请在下载后24小时内删除
-* 卖源码的死个妈
+* 出售源码者的母亲会升天
 * 本软件作者yoshiko2保留最终决定权和最终解释权
 * 若用户不同意上述条款任意一条，请勿使用本软件
 ---
@@ -44,23 +44,24 @@ When you view and download the source code or binary program of this project, it
 * **Please do not promote this project on popular social platforms**
 * The software author wrote this software to learn Python and improve programming
 * This software does not provide any clues for video download
-* Before using this software, please understand and abide by local laws and regulations. If there is any violation of local laws and regulations during the use of this software, * please do not use this software
+* Before using this software, please understand and abide by local laws and regulations. If there is any violation of local laws and regulations during the use of this software, * please do not use this software  
 * When the user uses this software, if the user has any illegal acts in the local area, the user shall bear
 * It is strictly forbidden for users to use this software for commercial and personal intentions
 * Please delete the source code and binary program within 24 hours after downloading
+* The mother of the source seller will die
 * The author of this software yoshiko2 reserves the right of final decision and final interpretation
 * If the user does not agree with any of the above terms, please do not use this software
 ---
-本プロジェクトのソースコード、バイナリファイルをダウンロード、または表示することによって、あなたは次の規約に拘束されることに同意したことになります。
-
+本プロジェクトのソースコード、バイナリファイルをダウンロード、または表示するしたうえで、あなたは本規約に同意したものと見なします。
 * このソフトウェアは、開発技術学習することのみに使用できます。
 * **ソーシャルメディアで本プロジェクトの宣伝をご遠慮ください**
 * 作者はPythonの勉強と技術力の向上のために、このソフトウェアを作成しました
-* 本ソフトウェアは、動画ダウンロード機能一切提供しません
-* 本ソフトウェアを使用する前に、現地の法令をよく理解する必要があります。あなたは、適用される現地の法令を順守する責任を負います
+* 本ソフトウェアは、あらゆる動画ダウンロード機能一切提供しません
+* 本ソフトウェアを使用する前に、現地の法律規範をよく理解する必要があります。あなたは、適用される現地の法令を順守する責任を負います
 * 本ソフトウェアを使用した結果生じた損害や法的責任につきまして作者は一切責任を負いません
-* 本ソフトウェアを商用、業務、その他の営利目的のために使用することはできません
+* 本ソフトウェアを商用、業務、その他の営利目的のために使用することは一切禁止します。
 * 本プロジェクトのソースコード、バイナリファイルをダウンロードした場合、24時間以内に削除してください
+* 元売り手の母親が天に召される
 * 最終解釈権は作者yoshiko2に属します
 * 本規約およびすべての適用法、規約および規則を遵守する場合にのみ本ソフトウェアを使用することができます
 
