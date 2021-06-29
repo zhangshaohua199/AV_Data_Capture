@@ -168,7 +168,7 @@ def search(keyword): #搜索，返回结果
 def main(number):
     try:
         try:
-            html = etree.fromstring(get_html('https://cn.airav.wiki/?search=' + number), etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+            html = etree.fromstring(get_html('https://cn.airav.wiki/?search=' + number + "&lang=zh-TW&lng=zh-CN"), etree.HTMLParser())  # //table/tr[1]/td[1]/text()
 
             vedio_href = str(html.xpath('//a[@class="d-block"]/@href')[0])
             vedio_href = 'https://cn.airav.wiki' + vedio_href
@@ -235,6 +235,4 @@ def main(number):
 if __name__ == '__main__':
     #print(main('ADN-188'))
 
-    print(main('041521_460'))
-    print(main('ADN-188'))
-    print(main('CJOD-278'))
+    print(main('061121-001'))

@@ -96,7 +96,7 @@ def create_data_and_move(file_path: str, c: config.Config, debug):
     #else:
         try:
             print("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-            # import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
             if n_number:
                 core_main(file_path, n_number, c)
             else:
